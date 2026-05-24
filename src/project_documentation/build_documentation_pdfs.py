@@ -48,7 +48,7 @@ def convert_markdown_dirs(docs_dirs: list[str], version: str, output_dir: Path) 
         category = path.name
         for md in sorted(path.rglob("*.md")):
             name = md.stem
-            out = output_dir / f"e_foc-{category}-{name}-{version}.pdf"
+            out = output_dir / f"{category}-{name}-{version}.pdf"
             _run_pandoc(out, md)
 
 
@@ -85,7 +85,7 @@ def convert_requirements(requirements_dir: Path, version: str, output_dir: Path)
             print("INFO: No requirements content to convert", file=sys.stderr)
             return
 
-        out = output_dir / f"e_foc-requirements-{version}.pdf"
+        out = output_dir / f"requirements-{version}.pdf"
         _run_pandoc(out, *tmp_mds)
 
 
