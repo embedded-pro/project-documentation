@@ -2,11 +2,21 @@
     "type": "array",
     "items": {
         "type": "object",
-        "required": ["id", "title", "shall"],
+        "required": [
+            "id",
+            "title",
+            "shall"
+        ],
         "properties": {
-            "id":    { "type": "string" },
-            "title": { "type": "string" },
-            "shall": { "type": "string" }
+            "id": {
+                "type": "string"
+            },
+            "title": {
+                "type": "string"
+            },
+            "shall": {
+                "type": "string"
+            }
         },
         "additionalProperties": false
     }
