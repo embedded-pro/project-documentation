@@ -21,7 +21,6 @@ from pathlib import Path
 
 import yaml
 
-
 PANDOC_FLAGS = [
     "--pdf-engine=pdflatex",
     "-V", "geometry:margin=2cm",

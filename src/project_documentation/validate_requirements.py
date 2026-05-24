@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 import yaml
-from jsonschema import validate, ValidationError
+from jsonschema import ValidationError, validate
 
 
 def main():

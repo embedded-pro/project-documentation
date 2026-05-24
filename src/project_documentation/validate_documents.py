@@ -8,7 +8,6 @@ from pathlib import Path
 
 import yaml
 
-
 ARCHITECTURE_REQUIRED_SECTIONS = [
     "Assumptions & Constraints",
     "System Overview",

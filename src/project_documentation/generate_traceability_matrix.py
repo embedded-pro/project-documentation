@@ -37,7 +37,6 @@ from pathlib import Path
 
 import yaml  # PyYAML — available in the CI environment via pip
 
-
 # ── Data loading ──────────────────────────────────────────────────────────────
 
 def load_requirements(requirements_dir: Path) -> dict[str, dict]:
