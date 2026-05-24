@@ -69,7 +69,7 @@ class TestConvertMarkdownDirs:
 
         out_path = mock_pandoc.call_args[0][0]
         assert not out_path.name.startswith("e_foc"), f"Unexpected e_foc prefix: {out_path.name}"
-        assert "design-foc-v2.0.pdf" == out_path.name
+        assert out_path.name == "design-foc-v2.0.pdf"
 
     def test_missing_dir_is_skipped(self, tmp_path: Path) -> None:
         output_dir = tmp_path / "out"
