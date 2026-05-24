@@ -8,6 +8,27 @@ from pathlib import Path
 import yaml
 
 
+def _build_markdown(template_text: str, yaml_files: list[Path]) -> str:
+    """Build a Markdown document from a template and YAML requirement files."""
+    sections: dict[str, list[dict[str, str]]] = {}
+
+    for yaml_file in yaml_files:
+        section = yaml_file.parent.name.replace("-", " ").replace("_", " ").title()
+        content = yaml.safe_load(yaml_file.read_text())
+        if content is None:
+            continue
+        sections.setdefault(section, []).extend(content)
+
+    markdown = template_text
+    for section, requirements in sorted(sections.items()):
+        markdown += f"\n## {section}\n\n"
+        for req in requirements:
+            markdown += f"### {req['id']}: {req['title']}\n\n"
+            markdown += f"{req['shall']}\n\n"
+
+    return markdown
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--requirements-dir", required=True, type=Path)
@@ -15,45 +36,26 @@ def main() -> None:
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
 
-    # Start with template content
-    markdown = args.template.read_text()
-
-    # Group requirements by subdirectory
     yaml_files = sorted(args.requirements_dir.glob("**/*.yaml"))
-    sections: dict[str, list[dict[str, str]]] = {}
-
-    for yaml_file in yaml_files:
-        section = yaml_file.parent.name.replace("-", " ").replace("_", " ").title()
-        content = yaml.safe_load(yaml_file.read_text())
-
-        if content is None:
-            continue
-
-        if section not in sections:
-            sections[section] = []
-        sections[section].extend(content)
-
-    # Generate markdown for each section
-    for section, requirements in sorted(sections.items()):
-        markdown += f"\n## {section}\n\n"
-
-        for req in requirements:
-            markdown += f"### {req['id']}: {req['title']}\n\n"
-            markdown += f"{req['shall']}\n\n"
+    markdown = _build_markdown(args.template.read_text(), yaml_files)
 
     # Write intermediate markdown
     md_path = args.output.with_suffix(".md")
     md_path.parent.mkdir(parents=True, exist_ok=True)
     md_path.write_text(markdown)
 
-    # Convert to PDF with pandoc
+    # Convert to PDF with pandoc (explicit engine for reproducibility)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    subprocess.run([
-        "pandoc", str(md_path),
-        "-o", str(args.output),
-        "--toc",
-        "-V", "geometry:margin=1in"
-    ], check=True)
+    subprocess.run(
+        [
+            "pandoc", str(md_path),
+            "-o", str(args.output),
+            "--pdf-engine=pdflatex",
+            "--toc",
+            "-V", "geometry:margin=1in",
+        ],
+        check=True,
+    )
 
     print(f"✓ Generated {args.output}")
 
