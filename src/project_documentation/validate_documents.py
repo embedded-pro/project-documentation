@@ -43,7 +43,7 @@ FORBIDDEN_CODE_LANGUAGES = {
 }
 
 
-def parse_frontmatter(text: str, relative_path: Path) -> tuple[dict | None, list[str]]:
+def parse_frontmatter(text: str, relative_path: Path) -> tuple[dict[str, object] | None, list[str]]:
     """Parse YAML frontmatter from a markdown document.
 
     Returns (parsed_dict_or_None, list_of_errors).
@@ -72,7 +72,7 @@ def parse_frontmatter(text: str, relative_path: Path) -> tuple[dict | None, list
     return data, errors
 
 
-def check_required_fields(frontmatter: dict) -> list[str]:
+def check_required_fields(frontmatter: dict[str, object]) -> list[str]:
     """Return a list of error messages for missing required frontmatter fields."""
     errors = []
     for field in REQUIRED_FRONTMATTER_FIELDS:

@@ -39,9 +39,9 @@ import yaml  # PyYAML — available in the CI environment via pip
 
 # ── Data loading ──────────────────────────────────────────────────────────────
 
-def load_requirements(requirements_dir: Path) -> dict[str, dict]:
+def load_requirements(requirements_dir: Path) -> dict[str, dict[str, str]]:
     """Return {req_id: {id, title, shall, domain}} for all YAML files."""
-    reqs: dict[str, dict] = {}
+    reqs: dict[str, dict[str, str]] = {}
     for yaml_file in sorted(requirements_dir.rglob("*.yaml")):
         domain = yaml_file.stem
         with yaml_file.open(encoding="utf-8") as fh:
@@ -135,7 +135,7 @@ def _scenario_status(scenarios: list[str], junit: dict[str, str]) -> str:
 
 
 def generate_matrix(
-    reqs: dict[str, dict],
+    reqs: dict[str, dict[str, str]],
     feature_map: dict[str, list[str]],
     junit: dict[str, str],
 ) -> str:
@@ -150,7 +150,7 @@ def generate_matrix(
     ]
 
     # Group by domain
-    domains: dict[str, list[dict]] = {}
+    domains: dict[str, list[dict[str, str]]] = {}
     for req in reqs.values():
         domains.setdefault(req["domain"], []).append(req)
 

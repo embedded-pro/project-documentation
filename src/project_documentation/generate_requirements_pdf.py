@@ -8,7 +8,7 @@ from pathlib import Path
 import yaml
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--requirements-dir", required=True, type=Path)
     parser.add_argument("--template", required=True, type=Path)
@@ -20,7 +20,7 @@ def main():
 
     # Group requirements by subdirectory
     yaml_files = sorted(args.requirements_dir.glob("**/*.yaml"))
-    sections = {}
+    sections: dict[str, list[dict[str, str]]] = {}
 
     for yaml_file in yaml_files:
         section = yaml_file.parent.name.replace("-", " ").replace("_", " ").title()

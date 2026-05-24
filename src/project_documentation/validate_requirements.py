@@ -10,7 +10,7 @@ import yaml
 from jsonschema import ValidationError, validate
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--schema", required=True, type=Path)
     parser.add_argument("--requirements-dir", required=True, type=Path)

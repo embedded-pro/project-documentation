@@ -52,7 +52,7 @@ def convert_markdown_dirs(docs_dirs: list[str], version: str, output_dir: Path) 
             _run_pandoc(out, md)
 
 
-def _requirement_to_markdown(req: dict) -> str:
+def _requirement_to_markdown(req: dict[str, str]) -> str:
     req_id = req.get("id", "").strip()
     title = req.get("title", "").strip()
     shall = req.get("shall", "").strip()
