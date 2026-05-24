@@ -1,0 +1,232 @@
+name: 'Project Documentation'
+description: >-
+  Documentation pipeline for embedded projects: validates YAML requirements
+  and Markdown documents, generates requirements PDFs, builds documentation
+  PDFs, and creates a requirements traceability matrix.
+author: 'project-documentation contributors'
+
+branding:
+  icon: 'book-open'
+  color: 'green'
+
+inputs:
+  # ── Feature flags ────────────────────────────────────────────────────────────
+  run-validate-requirements:
+    description: "Validate YAML requirement files against their JSON schema"
+    required: false
+    default: 'false'
+  run-validate-documents:
+    description: "Validate Markdown documentation files against templates"
+    required: false
+    default: 'false'
+  run-generate-requirements-pdf:
+    description: "Generate a PDF from YAML requirement files using a template"
+    required: false
+    default: 'false'
+  run-build-documentation-pdfs:
+    description: "Convert Markdown documentation and YAML requirements to PDFs"
+    required: false
+    default: 'false'
+  run-traceability-matrix:
+    description: "Generate the requirements-vs-SIL traceability matrix"
+    required: false
+    default: 'false'
+
+  # ── Shared ───────────────────────────────────────────────────────────────────
+  requirements-dir:
+    description: "Directory containing YAML requirement files"
+    required: false
+    default: "documentation/requirements"
+
+  # ── validate-requirements ────────────────────────────────────────────────────
+  schema-path:
+    description: "Path to the JSON schema file for requirements validation"
+    required: false
+    default: "documentation/tools/requirement.schema.json"
+
+  # ── validate-documents ───────────────────────────────────────────────────────
+  documents-dir:
+    description: "Directory to search for documentation files"
+    required: false
+    default: "documentation"
+  doc-type:
+    description: "Filter by document type: architecture, design, theory, or all"
+    required: false
+    default: "all"
+
+  # ── generate-requirements-pdf ────────────────────────────────────────────────
+  template-path:
+    description: "Path to the Markdown template for requirements PDF"
+    required: false
+    default: "documentation/templates/requirements.md"
+  requirements-pdf-output:
+    description: "Output path for the generated requirements PDF"
+    required: false
+    default: "documentation/output/requirements.pdf"
+  upload-requirements-pdf:
+    description: "Upload the generated requirements PDF as a workflow artifact"
+    required: false
+    default: 'false'
+
+  # ── build-documentation-pdfs ─────────────────────────────────────────────────
+  version:
+    description: "Release version tag used to name output files (e.g. v1.2.3)"
+    required: false
+    default: ""
+  output-dir:
+    description: "Output directory for generated documentation PDFs"
+    required: false
+    default: "docs-pdf"
+  docs-dirs:
+    description: >-
+      Space-separated list of documentation directories to convert to PDF
+    required: false
+    default: "documentation/architecture documentation/design documentation/theory"
+  artifact-name:
+    description: "Name for the uploaded documentation PDFs artifact"
+    required: false
+    default: "documentation-pdfs"
+
+  # ── traceability-matrix ──────────────────────────────────────────────────────
+  features-dir:
+    description: "Directory containing Gherkin feature files"
+    required: false
+    default: "integration_tests/software_in_the_loop/features"
+  junit-xml:
+    description: "Path to JUnit XML from SIL test run (optional; adds status column)"
+    required: false
+    default: ""
+  matrix-output:
+    description: "Output path for the generated traceability matrix Markdown file"
+    required: false
+    default: "docs-pdf/traceability-matrix.md"
+  matrix-pdf-output:
+    description: "If set, also convert the traceability matrix to a PDF at this path"
+    required: false
+    default: ""
+
+  # ── Tooling ──────────────────────────────────────────────────────────────────
+  python-version:
+    description: "Python version to set up"
+    required: false
+    default: "3.11"
+  package-version:
+    description: >-
+      pip-installable version specifier for project-documentation (e.g.
+      "==0.1.0" or "@git+https://…"). Empty installs the latest from PyPI.
+    required: false
+    default: ""
+
+outputs:
+  output-dir:
+    description: "Path to the directory containing generated documentation PDFs"
+    value: ${{ inputs.output-dir }}
+  matrix-path:
+    description: "Path to the generated Markdown traceability matrix"
+    value: ${{ inputs.matrix-output }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install project-documentation
+      shell: bash
+      run: |
+        set -euo pipefail
+        if [[ -n "${{ inputs.package-version }}" ]]; then
+          python -m pip install --quiet "project-documentation${{ inputs.package-version }}"
+        else
+          python -m pip install --quiet project-documentation
+        fi
+
+    - name: Install Pandoc and LaTeX
+      if: >-
+        inputs.run-generate-requirements-pdf == 'true' ||
+        inputs.run-build-documentation-pdfs == 'true' ||
+        (inputs.run-traceability-matrix == 'true' && inputs.matrix-pdf-output != '')
+      shell: bash
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -y --no-install-recommends \
+          pandoc \
+          texlive-latex-recommended \
+          texlive-latex-extra \
+          texlive-fonts-recommended
+
+    - name: Validate requirements
+      if: inputs.run-validate-requirements == 'true'
+      shell: bash
+      run: |
+        project-documentation-validate-requirements \
+          --schema           "${{ inputs.schema-path }}" \
+          --requirements-dir "${{ inputs.requirements-dir }}"
+
+    - name: Validate documents
+      if: inputs.run-validate-documents == 'true'
+      shell: bash
+      run: |
+        project-documentation-validate-documents \
+          --documents-dir "${{ inputs.documents-dir }}" \
+          --doc-type      "${{ inputs.doc-type }}"
+
+    - name: Generate requirements PDF
+      if: inputs.run-generate-requirements-pdf == 'true'
+      shell: bash
+      run: |
+        project-documentation-generate-requirements-pdf \
+          --requirements-dir "${{ inputs.requirements-dir }}" \
+          --template         "${{ inputs.template-path }}" \
+          --output           "${{ inputs.requirements-pdf-output }}"
+
+    - name: Upload requirements PDF
+      if: inputs.run-generate-requirements-pdf == 'true' && inputs.upload-requirements-pdf == 'true'
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: requirements-pdf
+        path: ${{ inputs.requirements-pdf-output }}
+        if-no-files-found: warn
+
+    - name: Build documentation PDFs
+      if: inputs.run-build-documentation-pdfs == 'true'
+      shell: bash
+      run: |
+        project-documentation-build-pdfs \
+          --version          "${{ inputs.version }}" \
+          --output-dir       "${{ inputs.output-dir }}" \
+          --docs-dirs        ${{ inputs.docs-dirs }} \
+          --requirements-dir "${{ inputs.requirements-dir }}"
+
+    - name: Upload documentation PDFs
+      if: inputs.run-build-documentation-pdfs == 'true'
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.output-dir }}/*.pdf
+        if-no-files-found: warn
+
+    - name: Generate traceability matrix
+      if: inputs.run-traceability-matrix == 'true'
+      shell: bash
+      run: |
+        project-documentation-traceability-matrix \
+          --requirements-dir "${{ inputs.requirements-dir }}" \
+          --features-dir     "${{ inputs.features-dir }}" \
+          ${{ inputs.junit-xml != '' && format('--junit-xml "{0}"', inputs.junit-xml) || '' }} \
+          --output           "${{ inputs.matrix-output }}"
+
+    - name: Convert traceability matrix to PDF
+      if: inputs.run-traceability-matrix == 'true' && inputs.matrix-pdf-output != ''
+      shell: bash
+      run: |
+        pandoc \
+          --pdf-engine=pdflatex \
+          -V geometry:margin=2cm \
+          -V fontsize=11pt \
+          --toc \
+          --standalone \
+          -o "${{ inputs.matrix-pdf-output }}" \
+          "${{ inputs.matrix-output }}"

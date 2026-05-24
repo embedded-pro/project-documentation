@@ -1,0 +1,18 @@
+- id: REQ-FOC-001
+  title: Independent Id and Iq current control
+  shall: >
+    The FOC implementation shall independently control the d-axis and q-axis
+    current components using separate PI controllers.
+
+- id: REQ-FOC-002
+  title: Clarke transform correctness
+  shall: >
+    The Clarke transform shall convert three-phase stator currents (ia, ib, ic)
+    to the two-phase stationary reference frame (alpha, beta) using the
+    power-invariant form.
+
+- id: REQ-FOC-003
+  title: Park transform correctness
+  shall: >
+    The Park transform shall convert stationary-frame currents (alpha, beta)
+    to the rotating reference frame (id, iq) using the rotor electrical angle.
