@@ -155,7 +155,8 @@ runs:
           pandoc \
           texlive-latex-recommended \
           texlive-latex-extra \
-          texlive-fonts-recommended
+          texlive-fonts-recommended \
+          lmodern
 
     - name: Validate requirements
       if: inputs.run-validate-requirements == 'true'
