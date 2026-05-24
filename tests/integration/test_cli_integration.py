@@ -222,11 +222,11 @@ class TestTraceabilityMatrixCLI:
     def test_coverage_summary_shows_percentage(self, tmp_path: Path) -> None:
         req_dir = tmp_path / "requirements"
         req_dir.mkdir()
-        _write_yaml(req_dir / "foc.yaml", [{"id": "REQ-001", "title": "T", "shall": "S"}])
+        _write_yaml(req_dir / "foc.yaml", [{"id": "REQ-FOC-001", "title": "T", "shall": "S"}])
         features_dir = tmp_path / "features"
         features_dir.mkdir()
         (features_dir / "foc.feature").write_text(
-            "Feature: F\n  # REQ-001\n  Scenario: S1\n    Given ...\n"
+            "Feature: F\n  # REQ-FOC-001\n  Scenario: S1\n    Given ...\n"
         )
         output = tmp_path / "matrix.md"
         _run(
