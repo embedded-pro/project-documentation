@@ -107,7 +107,9 @@ inputs:
 
   # ── Tooling ──────────────────────────────────────────────────────────────────
   python-version:
-    description: "Python version to set up"
+    description: >-
+      Python version to set up. Set to an empty string to use the python3 that is
+      already on the PATH, e.g. when running inside a container image.
     required: false
     default: "3.11"
   package-version:
@@ -129,19 +131,25 @@ runs:
   using: "composite"
   steps:
     - name: Set up Python
+      if: inputs.python-version != ''
       uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
       with:
         python-version: ${{ inputs.python-version }}
 
+    # Install into a virtual environment so this also works with an externally
+    # managed system Python (PEP 668), e.g. inside a container image.
     - name: Install project-documentation
       shell: bash
       run: |
         set -euo pipefail
+        venv="${RUNNER_TEMP}/project-documentation-venv"
+        python3 -m venv "${venv}"
         if [[ -n "${{ inputs.package-version }}" ]]; then
-          python -m pip install --quiet "project-documentation${{ inputs.package-version }}"
+          "${venv}/bin/python" -m pip install --quiet "project-documentation${{ inputs.package-version }}"
         else
-          python -m pip install --quiet project-documentation
+          "${venv}/bin/python" -m pip install --quiet project-documentation
         fi
+        echo "${venv}/bin" >> "${GITHUB_PATH}"
 
     - name: Install Pandoc and LaTeX
       if: >-
@@ -150,8 +158,20 @@ runs:
         (inputs.run-traceability-matrix == 'true' && inputs.matrix-pdf-output != '')
       shell: bash
       run: |
-        sudo apt-get update -qq
-        sudo apt-get install -y --no-install-recommends \
+        set -euo pipefail
+        # Skip the installation when the tools are already available, e.g. in the
+        # embedded-devcontainer-documentation container image.
+        if command -v pandoc >/dev/null 2>&1 && command -v pdflatex >/dev/null 2>&1 \
+          && kpsewhich lmodern.sty titlesec.sty >/dev/null 2>&1; then
+          echo "Pandoc and LaTeX are already installed"
+          exit 0
+        fi
+        sudo=""
+        if [[ "$(id -u)" -ne 0 ]]; then
+          sudo="sudo"
+        fi
+        ${sudo} apt-get update -qq
+        ${sudo} apt-get install -y --no-install-recommends \
           pandoc \
           texlive-latex-recommended \
           texlive-latex-extra \
