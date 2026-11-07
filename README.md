@@ -98,7 +98,8 @@ The PDF-generating capabilities require:
 - `pandoc` — document converter
 - `pdflatex` (via `texlive-latex-recommended`, `texlive-latex-extra`, `texlive-fonts-recommended`)
 
-The GitHub Action installs these automatically when any PDF feature flag is enabled.
+The GitHub Action installs these automatically when any PDF feature flag is enabled, unless they are already available.
+To skip the installation entirely, run the job in the [`embedded-devcontainer-documentation`](https://hub.docker.com/r/gabrielfrasantos/embedded-devcontainer-documentation) container image and set `python-version: ""`.
 
 ## 📄 License
 

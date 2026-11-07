@@ -78,7 +78,7 @@ matrix.
 
 | Input             | Default  | Description                                                                            |
 |------------------|----------|----------------------------------------------------------------------------------------|
-| `python-version` | `3.11`   | Python version to use.                                                                 |
+| `python-version` | `3.11`   | Python version to set up. Empty = use the `python3` on the PATH (e.g. in a container). |
 | `package-version`| `""`     | pip specifier for `project-documentation` (e.g. `==0.1.0`). Empty = latest from PyPI. |
 
 ---
