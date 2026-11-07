@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0](https://github.com/embedded-pro/project-documentation/compare/v0.2.0...v0.3.0) (2026-11-07)
+
+
+### Features
+
+* integration tests, unit tests for all modules, codeql, fix pdf prefix and engine ([62c3fcc](https://github.com/embedded-pro/project-documentation/commit/62c3fcc4bc9f575a562b7377358e0093e2232596))
+* run the action inside the embedded-devcontainer-documentation container ([62d3d36](https://github.com/embedded-pro/project-documentation/commit/62d3d36f72dba1a107af94f71103442afee09e3c))
+* run the action inside the embedded-devcontainer-documentation container ([6f11819](https://github.com/embedded-pro/project-documentation/commit/6f118192bb8b509c3c5c2e1c8ce7fce351cf03af))
+
+
+### Bug Fixes
+
+* add lmodern to LaTeX install for lmodern.sty ([54fca1c](https://github.com/embedded-pro/project-documentation/commit/54fca1cb9925af16e53bd9d2640d1285560d295b))
+* add lmodern to LaTeX install for lmodern.sty ([df9b912](https://github.com/embedded-pro/project-documentation/commit/df9b9120a2be16def01b465964a8543bcbe76728))
+* rewrite yoda condition in test (SIM300) ([714e373](https://github.com/embedded-pro/project-documentation/commit/714e373c832189bdc19534fe827fb605fb87421f))
+* upgrade pip in the action virtual environment ([6fc0a8d](https://github.com/embedded-pro/project-documentation/commit/6fc0a8def30c83c2e0008bbcf1a072b8244188fb))
+* use REQ-FOC-001 format in traceability test (matches REQ-[A-Z]+-\d+ regex) ([5dd98cc](https://github.com/embedded-pro/project-documentation/commit/5dd98ccc3e04a9ced57aa8102ae3b1f64b8332c5))
+
 ## [0.2.0](https://github.com/embedded-pro/project-documentation/compare/v0.1.0...v0.2.0) (2026-05-24)
 
 

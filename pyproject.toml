@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "project-documentation"
-version = "0.2.0"
+version = "0.3.0"
 description = "Documentation pipeline for embedded projects: validates requirements and design documents, generates PDFs, and produces a traceability matrix."
 readme = "README.md"
 requires-python = ">=3.11"
