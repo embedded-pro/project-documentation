@@ -144,6 +144,8 @@ runs:
         set -euo pipefail
         venv="${RUNNER_TEMP}/project-documentation-venv"
         python3 -m venv "${venv}"
+        # The pip bundled with the venv can be too old to parse "name @ url" requirements.
+        "${venv}/bin/python" -m pip install --quiet --upgrade pip
         if [[ -n "${{ inputs.package-version }}" ]]; then
           "${venv}/bin/python" -m pip install --quiet "project-documentation${{ inputs.package-version }}"
         else
