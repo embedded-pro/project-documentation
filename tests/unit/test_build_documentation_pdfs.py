@@ -71,6 +71,21 @@ class TestConvertMarkdownDirs:
         assert not out_path.name.startswith("e_foc"), f"Unexpected e_foc prefix: {out_path.name}"
         assert out_path.name == "design-foc-v2.0.pdf"
 
+    def test_name_prefix_leads_the_file_name(self, tmp_path: Path) -> None:
+        docs_dir = tmp_path / "design"
+        docs_dir.mkdir()
+        (docs_dir / "safety.md").write_text("# Safety\n")
+        output_dir = tmp_path / "out"
+        output_dir.mkdir()
+
+        with patch(
+            "project_documentation.build_documentation_pdfs._run_pandoc",
+            return_value=True,
+        ) as mock_pandoc:
+            convert_markdown_dirs([str(docs_dir)], "v1.0.1", output_dir, "my_project")
+
+        assert mock_pandoc.call_args[0][0].name == "my_project-design-safety-v1.0.1.pdf"
+
     def test_missing_dir_is_skipped(self, tmp_path: Path) -> None:
         output_dir = tmp_path / "out"
         output_dir.mkdir()
@@ -102,6 +117,21 @@ class TestConvertRequirements:
         out_path = str(mock_pandoc.call_args[0][0])
         assert "requirements-v1.2.pdf" in out_path
         assert "e_foc" not in out_path
+
+    def test_name_prefix_leads_the_file_name(self, tmp_path: Path) -> None:
+        req_dir = tmp_path / "requirements"
+        req_dir.mkdir()
+        _write_yaml(req_dir / "arm.yaml", [{"id": "REQ-ARM-001", "title": "T", "shall": "S"}])
+        output_dir = tmp_path / "out"
+        output_dir.mkdir()
+
+        with patch(
+            "project_documentation.build_documentation_pdfs._run_pandoc",
+            return_value=True,
+        ) as mock_pandoc:
+            convert_requirements(req_dir, "v1.0.1", output_dir, "my_project")
+
+        assert mock_pandoc.call_args[0][0].name == "my_project-requirements-v1.0.1.pdf"
 
     def test_empty_requirements_dir_skips_pandoc(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
