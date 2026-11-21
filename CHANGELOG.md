@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0](https://github.com/embedded-pro/project-documentation/compare/v0.3.0...v0.4.0) (2026-11-21)
+
+
+### Features
+
+* Name the PDFs after the project; the action runs its own source ([b687ff4](https://github.com/embedded-pro/project-documentation/commit/b687ff41f49b4eba92dc688f1ef0b7971f21828d))
+* Name the PDFs after the project; the action runs its own source ([748f0f3](https://github.com/embedded-pro/project-documentation/commit/748f0f325d90233f5965b2e9c03d50f31f8db6a2))
+
+
+### Bug Fixes
+
+* **release:** Publish with gh-action-pypi-publish v1.14.3 ([a54d0a2](https://github.com/embedded-pro/project-documentation/commit/a54d0a2fbd827fa9ad314521e7272ab8f7c7bf64))
+
 ## [0.3.0](https://github.com/embedded-pro/project-documentation/compare/v0.2.0...v0.3.0) (2026-11-07)
 
 
