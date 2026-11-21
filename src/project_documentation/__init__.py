@@ -1,3 +1,3 @@
 """project-documentation — documentation pipeline for embedded projects."""
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
