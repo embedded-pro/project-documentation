@@ -6,6 +6,7 @@ requirements to PDF using Pandoc.
 Usage:
     project-documentation-build-pdfs \\
         --version v1.2.3 \\
+        --name-prefix my_project \\
         --output-dir docs-pdf \\
         --docs-dirs documentation/architecture documentation/design documentation/theory \\
         --requirements-dir documentation/requirements
@@ -40,7 +41,11 @@ def _run_pandoc(output_path: Path, *input_paths: Path) -> bool:
     return True
 
 
-def convert_markdown_dirs(docs_dirs: list[str], version: str, output_dir: Path) -> None:
+def _pdf_name(prefix: str, *parts: str) -> str:
+    return "-".join(part for part in (prefix, *parts) if part) + ".pdf"
+
+
+def convert_markdown_dirs(docs_dirs: list[str], version: str, output_dir: Path, prefix: str = "") -> None:
     for docdir in docs_dirs:
         path = Path(docdir)
         if not path.is_dir():
@@ -48,7 +53,7 @@ def convert_markdown_dirs(docs_dirs: list[str], version: str, output_dir: Path) 
         category = path.name
         for md in sorted(path.rglob("*.md")):
             name = md.stem
-            out = output_dir / f"{category}-{name}-{version}.pdf"
+            out = output_dir / _pdf_name(prefix, category, name, version)
             _run_pandoc(out, md)
 
 
@@ -63,7 +68,7 @@ def _requirement_to_markdown(req: dict[str, str]) -> str:
     return "\n".join(lines)
 
 
-def convert_requirements(requirements_dir: Path, version: str, output_dir: Path) -> None:
+def convert_requirements(requirements_dir: Path, version: str, output_dir: Path, prefix: str = "") -> None:
     yaml_files = sorted(requirements_dir.rglob("*.yaml"))
     if not yaml_files:
         print(f"INFO: No YAML files found in {requirements_dir}", file=sys.stderr)
@@ -85,13 +90,18 @@ def convert_requirements(requirements_dir: Path, version: str, output_dir: Path)
             print("INFO: No requirements content to convert", file=sys.stderr)
             return
 
-        out = output_dir / f"requirements-{version}.pdf"
+        out = output_dir / _pdf_name(prefix, "requirements", version)
         _run_pandoc(out, *tmp_mds)
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build documentation PDFs from Markdown and YAML requirements")
     parser.add_argument("--version", required=True, help="Release version tag (e.g. v1.2.3)")
+    parser.add_argument(
+        "--name-prefix",
+        default="",
+        help="Prefix for every PDF file name, e.g. the project name (my_project-design-x-v1.2.3.pdf)",
+    )
     parser.add_argument("--output-dir", default="docs-pdf", help="Output directory for PDFs")
     parser.add_argument(
         "--docs-dirs",
@@ -109,8 +119,8 @@ def main() -> int:
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    convert_markdown_dirs(args.docs_dirs, args.version, output_dir)
-    convert_requirements(Path(args.requirements_dir), args.version, output_dir)
+    convert_markdown_dirs(args.docs_dirs, args.version, output_dir, args.name_prefix)
+    convert_requirements(Path(args.requirements_dir), args.version, output_dir, args.name_prefix)
 
     return 0
 

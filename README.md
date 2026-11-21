@@ -72,6 +72,7 @@ project-documentation-generate-requirements-pdf \
 # Build all documentation PDFs
 project-documentation-build-pdfs \
     --version v1.2.3 \
+    --name-prefix my_project \
     --output-dir docs-pdf \
     --docs-dirs documentation/architecture documentation/design documentation/theory \
     --requirements-dir documentation/requirements

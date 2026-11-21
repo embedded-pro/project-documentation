@@ -73,6 +73,12 @@ inputs:
     description: "Release version tag used to name output files (e.g. v1.2.3)"
     required: false
     default: ""
+  name-prefix:
+    description: >-
+      Prefix for every documentation PDF file name, usually the project name
+      (e.g. my_project gives my_project-design-safety-v1.2.3.pdf). Empty adds none.
+    required: false
+    default: ""
   output-dir:
     description: "Output directory for generated documentation PDFs"
     required: false
@@ -115,7 +121,8 @@ inputs:
   package-version:
     description: >-
       pip-installable version specifier for project-documentation (e.g.
-      "==0.1.0" or "@git+https://…"). Empty installs the latest from PyPI.
+      "==0.1.0" or "@git+https://…"). Empty installs the package from this
+      action's own source, so the code that runs is the ref the workflow pins.
     required: false
     default: ""
 
@@ -149,7 +156,7 @@ runs:
         if [[ -n "${{ inputs.package-version }}" ]]; then
           "${venv}/bin/python" -m pip install --quiet "project-documentation${{ inputs.package-version }}"
         else
-          "${venv}/bin/python" -m pip install --quiet project-documentation
+          "${venv}/bin/python" -m pip install --quiet "${GITHUB_ACTION_PATH}"
         fi
         echo "${venv}/bin" >> "${GITHUB_PATH}"
 
@@ -219,6 +226,7 @@ runs:
       run: |
         project-documentation-build-pdfs \
           --version          "${{ inputs.version }}" \
+          --name-prefix      "${{ inputs.name-prefix }}" \
           --output-dir       "${{ inputs.output-dir }}" \
           --docs-dirs        ${{ inputs.docs-dirs }} \
           --requirements-dir "${{ inputs.requirements-dir }}"
